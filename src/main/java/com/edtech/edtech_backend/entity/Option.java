@@ -16,7 +16,7 @@ public class Option {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id", nullable = false)
     private Question question;
 
@@ -25,4 +25,8 @@ public class Option {
 
     @Column(nullable = false)
     private int optionIndex;
+
+    @Column(nullable = false)
+    private boolean correct;
+
 }

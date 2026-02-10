@@ -28,19 +28,9 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
-                        .requestMatchers(
-                                "/auth/**",
-                                "/setup/**"
-                        ).permitAll()
-
-                        // Admin endpoints
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/setup/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("SUPER_ADMIN")
-
-                        // Student endpoints
-                        .requestMatchers("/student/**").hasRole("STUDENT")
-
-                        // Everything else requires authentication
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(

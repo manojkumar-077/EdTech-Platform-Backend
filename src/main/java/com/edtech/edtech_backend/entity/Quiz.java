@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "quizzes")
@@ -23,6 +24,10 @@ public class Quiz {
     @Column(nullable = false)
     private ClassGrade classGrade;
 
+    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Question> questions;
+
+
     @Column(nullable = false)
     private String subjectName;
 
@@ -30,6 +35,7 @@ public class Quiz {
     private int durationMinutes;
 
     private LocalDateTime createdAt;
+
 
     @PrePersist
     protected void onCreate() {
