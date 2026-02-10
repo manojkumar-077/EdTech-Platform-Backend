@@ -1,4 +1,22 @@
 spring:
-  application:
-    name: edtech-backend
-git int
+  datasource:
+    url: jdbc:postgresql://localhost:5432/edtech_db
+    username: postgres
+    password: M@noj+07
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update   # dev only
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  sql:
+    init:
+      mode: never
+
+server:
+  port: 8080
