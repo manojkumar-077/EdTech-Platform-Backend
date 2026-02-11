@@ -2,6 +2,7 @@ package com.edtech.edtech_backend.student.service;
 
 import com.edtech.edtech_backend.common.enums.ClassGrade;
 import com.edtech.edtech_backend.common.enums.Role;
+import com.edtech.edtech_backend.common.exception.ResourceNotFoundException;
 import com.edtech.edtech_backend.common.util.PasswordGenerator;
 import com.edtech.edtech_backend.entity.Student;
 import com.edtech.edtech_backend.entity.User;
@@ -59,32 +60,37 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public StudentProfileResponseDto getProfile() {
 
-        CustomUserDetails userDetails =
-                (CustomUserDetails) SecurityContextHolder
-                        .getContext()
-                        .getAuthentication()
-                        .getPrincipal();
+        User user = getLoggedInUser();
 
-        User user = userDetails.getUser();
 
-        Student student = studentRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new RuntimeException("Student profile not found"));
+        System.out.println("==== STUDENT PROFILE DEBUG ====");
+        System.out.println("User ID    : " + user.getId());
+        System.out.println("User Email : [" + user.getEmail() + "]");
+        System.out.println("================================");
+
+        Student student = studentRepository.findByUser_Email(user.getEmail())
+                .orElseThrow(() -> new ResourceNotFoundException("Student profile not found"));
 
         return StudentProfileResponseDto.from(student);
     }
 
-    // STUDENT → UPDATE PROFILE (LIMITED FIELDS)
+
+
+
     @Override
-    public void updateProfile(UpdateStudentProfileDto dto) {
+    public StudentProfileResponseDto getStudentById(Long studentId) {
 
-        CustomUserDetails userDetails =
-                (CustomUserDetails) SecurityContextHolder
-                        .getContext()
-                        .getAuthentication()
-                        .getPrincipal();
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
 
-        Student student = studentRepository.findByUserId(userDetails.getUser().getId())
-                .orElseThrow(() -> new RuntimeException("Student profile not found"));
+        return StudentProfileResponseDto.from(student);
+    }
+
+    @Override
+    public void updateStudentById(Long studentId, UpdateStudentProfileDto dto) {
+
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
 
         student.setFullName(dto.getFullName());
         student.setFatherName(dto.getFatherName());
@@ -94,20 +100,40 @@ public class StudentServiceImpl implements StudentService {
         studentRepository.save(student);
     }
 
-    // STUDENT → AVATAR UPLOAD (METADATA)
     @Override
-    public void uploadAvatar(StudentAvatarUploadDto dto) {
+    public void deleteStudentById(Long studentId) {
 
-        CustomUserDetails userDetails =
-                (CustomUserDetails) SecurityContextHolder
-                        .getContext()
-                        .getAuthentication()
-                        .getPrincipal();
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
 
-        Student student = studentRepository.findByUserId(userDetails.getUser().getId())
-                .orElseThrow(() -> new RuntimeException("Student profile not found"));
+        User user = student.getUser();
+
+        studentRepository.delete(student);   // delete student first
+        userRepository.delete(user);         // then delete user
+    }
+
+    @Override
+    public void uploadAvatarByStudentId(Long studentId, StudentAvatarUploadDto dto) {
+
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
 
         student.setAvatarUrl(dto.getAvatarUrl());
         studentRepository.save(student);
     }
+
+
+    private User getLoggedInUser() {
+        Object principal = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        if (!(principal instanceof CustomUserDetails userDetails)) {
+            throw new ResourceNotFoundException("Invalid authentication");
+        }
+
+        return userDetails.getUser();
+    }
+
 }

@@ -18,5 +18,12 @@ spring:
     init:
       mode: never
 
+# 🔍 ADD THIS SECTION FOR DEBUGGING
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.springframework.security: DEBUG
+
 server:
   port: 9090

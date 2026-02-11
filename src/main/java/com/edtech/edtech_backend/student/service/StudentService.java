@@ -7,8 +7,13 @@ public interface StudentService {
     void createStudent(CreateStudentDto dto);
 
     StudentProfileResponseDto getProfile();
+    StudentProfileResponseDto getStudentById(Long studentId);
+    void updateStudentById(Long studentId, UpdateStudentProfileDto dto);
 
-    void updateProfile(UpdateStudentProfileDto dto);
+    void deleteStudentById(Long studentId);
+    void uploadAvatarByStudentId(Long studentId, StudentAvatarUploadDto dto);
 
-    void uploadAvatar(StudentAvatarUploadDto dto);
+
+
+
 }

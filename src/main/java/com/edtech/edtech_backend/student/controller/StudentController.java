@@ -4,6 +4,7 @@ import com.edtech.edtech_backend.student.dto.*;
 import com.edtech.edtech_backend.student.service.StudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -26,20 +27,42 @@ public class StudentController {
     public ResponseEntity<StudentProfileResponseDto> getProfile() {
         return ResponseEntity.ok(studentService.getProfile());
     }
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @GetMapping("/{studentId}")
+    public ResponseEntity<StudentProfileResponseDto> getStudentById(
+            @PathVariable Long studentId) {
 
-    // STUDENT → UPDATE PROFILE
-    @PutMapping("/profile")
-    public ResponseEntity<String> updateProfile(
+        return ResponseEntity.ok(studentService.getStudentById(studentId));
+    }
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @PutMapping("/{studentId}")
+    public ResponseEntity<String> updateStudentById(
+            @PathVariable Long studentId,
             @RequestBody UpdateStudentProfileDto dto) {
-        studentService.updateProfile(dto);
-        return ResponseEntity.ok("Profile updated successfully");
+
+        studentService.updateStudentById(studentId, dto);
+        return ResponseEntity.ok("Student updated successfully");
     }
 
-    // STUDENT → UPLOAD AVATAR (metadata only)
-    @PostMapping("/profile/avatar")
-    public ResponseEntity<String> uploadAvatar(
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @DeleteMapping("/{studentId}")
+    public ResponseEntity<String> deleteStudentById(
+            @PathVariable Long studentId) {
+
+        studentService.deleteStudentById(studentId);
+        return ResponseEntity.ok("Student deleted successfully");
+    }
+
+
+
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @PostMapping("/{studentId}/avatar")
+    public ResponseEntity<String> uploadAvatarByStudentId(
+            @PathVariable Long studentId,
             @RequestBody StudentAvatarUploadDto dto) {
-        studentService.uploadAvatar(dto);
+
+        studentService.uploadAvatarByStudentId(studentId, dto);
         return ResponseEntity.ok("Avatar updated successfully");
     }
+
 }
