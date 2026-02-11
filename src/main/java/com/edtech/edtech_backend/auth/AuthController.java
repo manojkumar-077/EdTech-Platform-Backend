@@ -15,6 +15,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(
             @RequestBody LoginRequestDto request) {
+        System.out.println(">>> AuthController.login() reached");
 
         System.out.println("LOGIN CONTROLLER HIT");
         return ResponseEntity.ok(authService.login(request));

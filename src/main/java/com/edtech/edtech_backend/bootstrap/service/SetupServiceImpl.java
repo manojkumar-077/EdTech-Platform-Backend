@@ -19,9 +19,9 @@ public class SetupServiceImpl implements SetupService {
     public void createInitialAdmin(InitialAdminRequestDto request) {
 
         // Allow only one SUPER_ADMIN
-        if (userRepository.countByRole(Role.SUPER_ADMIN) > 0) {
-            throw new RuntimeException("Super Admin already exists");
-        }
+//        if (userRepository.countByRole(Role.SUPER_ADMIN) > 0) {
+//            throw new RuntimeException("Super Admin already exists");
+//        }
 
         User admin = User.builder()
                 .email(request.getEmail())

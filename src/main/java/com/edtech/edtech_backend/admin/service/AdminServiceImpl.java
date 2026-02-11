@@ -29,7 +29,7 @@ public class AdminServiceImpl implements AdminService {
         User admin = User.builder()
                 .email(dto.getEmail())
                 .password(passwordEncoder.encode(dto.getPassword()))
-                .role(Role.SUPER_ADMIN)
+                .role(Role.ADMIN)   // ✅ CHANGE HERE
                 .isActive(true)
                 .build();
 
@@ -41,11 +41,15 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public List<AdminResponseDto> getAllAdmins() {
 
-        return userRepository.findByRole(Role.SUPER_ADMIN)
-                .stream()
+        List<User> admins = userRepository.findByRoleIn(
+                List.of(Role.SUPER_ADMIN, Role.ADMIN)
+        );
+
+        return admins.stream()
                 .map(AdminResponseDto::from)
                 .collect(Collectors.toList());
     }
+
 
     @Override
     public void deleteAdmin(Long adminId) {

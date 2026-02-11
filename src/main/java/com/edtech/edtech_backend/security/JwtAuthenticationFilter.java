@@ -28,11 +28,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
+        String path = request.getServletPath();
+
+        // ✅ ABSOLUTE BYPASS FOR PUBLIC ENDPOINTS
+        if (path.equals("/auth/login")
+                || path.equals("/auth/forgot-password")
+                || path.equals("/auth/verify-otp")
+                || path.equals("/auth/reset-password")
+                || path.startsWith("/setup")) {
+
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String header = request.getHeader(JwtConfig.HEADER_STRING);
 
         if (header != null && header.startsWith(JwtConfig.TOKEN_PREFIX)) {
 
-            String token = header.replace(JwtConfig.TOKEN_PREFIX, "");
+            String token = header.substring(JwtConfig.TOKEN_PREFIX.length());
 
             if (jwtTokenProvider.validateToken(token)) {
 
@@ -58,4 +71,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+
 }
