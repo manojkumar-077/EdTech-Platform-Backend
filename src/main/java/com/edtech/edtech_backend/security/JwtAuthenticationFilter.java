@@ -30,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String path = request.getServletPath();
 
-        // ✅ ABSOLUTE BYPASS FOR PUBLIC ENDPOINTS
+        // Public endpoints
         if (path.equals("/auth/login")
                 || path.equals("/auth/forgot-password")
                 || path.equals("/auth/verify-otp")
@@ -51,25 +51,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 String email = jwtTokenProvider.getEmailFromToken(token);
 
-                CustomUserDetails userDetails =
-                        (CustomUserDetails) userDetailsService.loadUserByUsername(email);
+                if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails,
-                                null,
-                                userDetails.getAuthorities()
+                    CustomUserDetails userDetails =
+                            (CustomUserDetails) userDetailsService.loadUserByUsername(email);
+
+                    if (userDetails != null) {
+
+                        UsernamePasswordAuthenticationToken authentication =
+                                new UsernamePasswordAuthenticationToken(
+                                        userDetails,
+                                        null,
+                                        userDetails.getAuthorities()
+                                );
+
+                        authentication.setDetails(
+                                new WebAuthenticationDetailsSource().buildDetails(request)
                         );
 
-                authentication.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
+                }
             }
         }
 
+        // ALWAYS continue filter chain
         filterChain.doFilter(request, response);
     }
-
 }
