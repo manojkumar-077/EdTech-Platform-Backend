@@ -4,6 +4,7 @@
     import lombok.RequiredArgsConstructor;
     import org.springframework.context.annotation.Bean;
     import org.springframework.context.annotation.Configuration;
+    import org.springframework.http.HttpMethod;
     import org.springframework.security.authentication.AuthenticationManager;
     import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
     import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -30,15 +31,28 @@
                             session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     )
                     .authorizeHttpRequests(auth -> auth
+
+                            // AUTH
                             .requestMatchers(
-                                    "/login",              // ✅ ADD THIS
-                                    "/auth/login",
-                                    "/auth/forgot-password",
-                                    "/auth/verify-otp",
-                                    "/auth/reset-password",
+                                    "/auth/**",
                                     "/setup/**"
                             ).permitAll()
 
+                            // SYLLABUS – ADMIN
+                            .requestMatchers(HttpMethod.POST, "/syllabus/**").hasRole("SUPER_ADMIN")
+
+                            // SYLLABUS – STUDENT & ADMIN
+                            .requestMatchers(HttpMethod.GET, "/syllabus/**")
+                            .hasAnyRole("STUDENT", "ADMIN", "SUPER_ADMIN")
+                                    // ADMIN quiz APIs
+                                    .requestMatchers("/admin/quizzes/**")
+                                    .hasRole("SUPER_ADMIN")
+
+// STUDENT quiz APIs
+                                    .requestMatchers("/student/quizzes/**")
+                                    .hasRole("STUDENT")
+
+                                    // ADMIN APIs
                             .requestMatchers("/admin/**").hasRole("SUPER_ADMIN")
 
                             .anyRequest().authenticated()

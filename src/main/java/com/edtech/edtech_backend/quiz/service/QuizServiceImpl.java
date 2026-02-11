@@ -34,7 +34,7 @@ public class QuizServiceImpl implements QuizService {
     @Override
     public List<QuizResponseDto> getQuizzesByClass(String classGrade) {
 
-        ClassGrade grade = ClassGrade.valueOf(classGrade);
+        ClassGrade grade = ClassGrade.valueOf(classGrade.toUpperCase());
 
         return quizRepository.findByClassGrade(grade)
                 .stream()
