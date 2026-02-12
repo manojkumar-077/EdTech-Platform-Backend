@@ -43,34 +43,9 @@ const getMaterials = async (
   return res.data;
 };
 
-// ================= STUDENT SIDE =================
-
-export interface StudentMaterial {
-  id: number;
-  subject: string;
-  fileName: string;
-  fileSize: string;
-  downloadUrl: string;
-  uploadedAt: string;
-}
-
-// Get materials for student (class inferred from backend)
-const getStudentMaterials = async (
-  subject?: string
-): Promise<StudentMaterial[]> => {
-  const res = await api.get("/student/materials", {
-    params: { subject },
-  });
-  return res.data;
-};
-
 export const syllabusService = {
-  // admin
   getSubjects,
   addSubject,
   uploadMaterial,
   getMaterials,
-
-  // student
-  getStudentMaterials,
 };
