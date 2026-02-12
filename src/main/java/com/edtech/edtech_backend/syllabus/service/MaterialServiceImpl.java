@@ -1,5 +1,6 @@
 package com.edtech.edtech_backend.syllabus.service;
 
+import com.edtech.edtech_backend.common.exception.ResourceNotFoundException;
 import com.edtech.edtech_backend.entity.Material;
 import com.edtech.edtech_backend.entity.Subject;
 import com.edtech.edtech_backend.repository.MaterialRepository;
@@ -25,7 +26,7 @@ public class MaterialServiceImpl implements MaterialService {
     public void uploadMaterial(MaterialUploadDto dto) {
 
         Subject subject = subjectRepository.findById(dto.getSubjectId())
-                .orElseThrow(() -> new RuntimeException("Subject not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Subject not found"));
 
         Material material = Material.builder()
                 .subject(subject)
@@ -41,7 +42,7 @@ public class MaterialServiceImpl implements MaterialService {
     @Override
     public List<MaterialResponseDto> getMaterials(Long subjectId) {
 
-        return materialRepository.findBySubjectId(subjectId)
+        return materialRepository.findBySubject_Id(subjectId)
                 .stream()
                 .map(MaterialResponseDto::from)
                 .collect(Collectors.toList());

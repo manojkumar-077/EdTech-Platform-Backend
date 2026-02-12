@@ -3,6 +3,8 @@ package com.edtech.edtech_backend.admin.service;
 import com.edtech.edtech_backend.admin.dto.AdminResponseDto;
 import com.edtech.edtech_backend.admin.dto.CreateAdminDto;
 import com.edtech.edtech_backend.common.enums.Role;
+import com.edtech.edtech_backend.common.exception.BadRequestException;
+import com.edtech.edtech_backend.common.exception.ResourceNotFoundException;
 import com.edtech.edtech_backend.entity.User;
 import com.edtech.edtech_backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +25,7 @@ public class AdminServiceImpl implements AdminService {
     public AdminResponseDto createAdmin(CreateAdminDto dto) {
 
         if (userRepository.existsByEmail(dto.getEmail())) {
-            throw new RuntimeException("Admin with email already exists");
+            throw new BadRequestException("Admin with email already exists");
         }
 
         User admin = User.builder()
@@ -55,7 +57,7 @@ public class AdminServiceImpl implements AdminService {
     public void deleteAdmin(Long adminId) {
 
         User admin = userRepository.findById(adminId)
-                .orElseThrow(() -> new RuntimeException("Admin not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Admin not found"));
 
         userRepository.delete(admin);
     }

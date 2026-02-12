@@ -1,5 +1,6 @@
 package com.edtech.edtech_backend.quiz.service;
 
+import com.edtech.edtech_backend.common.exception.ResourceNotFoundException;
 import com.edtech.edtech_backend.entity.Quiz;
 import com.edtech.edtech_backend.quiz.dto.*;
 import com.edtech.edtech_backend.repository.QuizAttemptRepository;
@@ -18,7 +19,7 @@ public class QuizAttemptServiceImpl implements QuizAttemptService {
     public StartQuizResponseDto startQuiz(Long quizId) {
 
         Quiz quiz = quizRepository.findById(quizId)
-                .orElseThrow(() -> new RuntimeException("Quiz not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Quiz not found"));
 
         return StartQuizResponseDto.from(quiz);
     }
@@ -27,7 +28,7 @@ public class QuizAttemptServiceImpl implements QuizAttemptService {
     public QuizResultDto submitQuiz(Long quizId, SubmitQuizDto dto) {
 
         Quiz quiz = quizRepository.findById(quizId)
-                .orElseThrow(() -> new RuntimeException("Quiz not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Quiz not found"));
 
         int totalQuestions = dto.getAnswers().size();
         int correctAnswers = 0; // placeholder

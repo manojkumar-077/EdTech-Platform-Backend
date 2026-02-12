@@ -2,6 +2,8 @@ package com.edtech.edtech_backend.auth;
 
 import com.edtech.edtech_backend.auth.dto.*;
 import com.edtech.edtech_backend.common.enums.Role;
+import com.edtech.edtech_backend.common.exception.BadRequestException;
+import com.edtech.edtech_backend.common.exception.ResourceNotFoundException;
 import com.edtech.edtech_backend.entity.OtpToken;
 import com.edtech.edtech_backend.entity.User;
 import com.edtech.edtech_backend.repository.OtpTokenRepository;
@@ -47,7 +49,7 @@ public class AuthServiceImpl implements AuthService {
         String token = jwtTokenProvider.generateToken(authentication);
 
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         System.out.println("JWT TOKEN GENERATED: " + token);
 
@@ -61,7 +63,7 @@ public class AuthServiceImpl implements AuthService {
     public void forgotPassword(ForgotPasswordRequestDto request) {
 
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         String otp = String.valueOf(100000 + new Random().nextInt(900000));
 
@@ -83,7 +85,7 @@ public class AuthServiceImpl implements AuthService {
 
         OtpToken otpToken = otpTokenRepository
                 .findByEmailAndOtpAndUsedFalse(request.getEmail(), request.getOtp())
-                .orElseThrow(() -> new RuntimeException("Invalid OTP"));
+                .orElseThrow(() -> new BadRequestException("Invalid OTP"));
 
         if (otpToken.getExpiryTime().isBefore(LocalDateTime.now())) {
             throw new RuntimeException("OTP expired");
@@ -97,7 +99,7 @@ public class AuthServiceImpl implements AuthService {
     public void resetPassword(ResetPasswordDto request) {
 
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);

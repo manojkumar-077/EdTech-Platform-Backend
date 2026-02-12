@@ -1,6 +1,7 @@
 package com.edtech.edtech_backend.syllabus.service;
 
 import com.edtech.edtech_backend.common.enums.ClassGrade;
+import com.edtech.edtech_backend.common.exception.BadRequestException;
 import com.edtech.edtech_backend.entity.Subject;
 import com.edtech.edtech_backend.repository.SubjectRepository;
 import com.edtech.edtech_backend.syllabus.dto.CreateSubjectDto;
@@ -32,9 +33,12 @@ public class SubjectServiceImpl implements SubjectService {
 
     @Override
     public List<SubjectResponseDto> getSubjectsByClass(String classGrade) {
-
-        ClassGrade grade = ClassGrade.valueOf(classGrade);
-
+        ClassGrade grade;
+        try {
+            grade = ClassGrade.valueOf(classGrade.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Invalid class grade: " + classGrade);
+        }
         return subjectRepository.findByClassGradeAndIsActiveTrue(grade)
                 .stream()
                 .map(SubjectResponseDto::from)
