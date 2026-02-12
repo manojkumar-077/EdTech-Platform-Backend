@@ -16,10 +16,6 @@ const login = async (data: LoginRequest): Promise<LoginResponse> => {
   const response = await api.post("/auth/login", data);
   return response.data;
 };
-const forgotPassword = async (email: string): Promise<void> => {
-  await api.post("/auth/forgot-password", { email });
-};
-
 
 const logout = () => {
   localStorage.removeItem("token");
@@ -30,5 +26,4 @@ const logout = () => {
 export const authService = {
   login,
   logout,
-  forgotPassword,
 };
